@@ -1,8 +1,9 @@
 import logo from './logo.svg';
 import './App.css';
+import toast, { Toaster } from "react-hot-toast";
 
 function App() {
-  const amount= 500;
+  const amount= 100;
   const currency= "INR";
   const receiptId= "qwsaq1";
 
@@ -24,19 +25,32 @@ function App() {
       "key": "rzp_test_1nbToCIUafcIWo", // Enter the Key ID generated from the Dashboard
       amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
       currency,
-      "name": "Acme Corp", //your business name
+      "name": "Aastha", //your business name
       "description": "Test Transaction",
       "image": "https://example.com/your_logo",
       "order_id":order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-      "handler": function (response){
-          alert(response.razorpay_payment_id);
-          alert(response.razorpay_order_id);
-          alert(response.razorpay_signature)
+      "handler": async function (response){
+        const body={
+          ...response,
+        };
+        const validateRes=await fetch("http://localhost:3000/order/validate",{
+          method:"POST",
+          body:JSON.stringify(body),
+          headers:{
+            "Content-Type":"application/json",
+          },
+        })
+        const jsonRes=await validateRes.json();
+        console.log(jsonRes);
+        if(jsonRes.msg)
+        {
+          toast.success(jsonRes.msg)
+        }
       },
       "prefill": { //We recommend using the prefill parameter to auto-fill customer's contact information, especially their phone number
-          "name": "Gaurav Kumar", //your customer's name
-          "email": "gaurav.kumar@example.com", 
-          "contact": "9000090000"  //Provide the customer's phone number for better conversion rates 
+          "name": "Aastha", //your customer's name
+          "email": "aastha@gmail.com", 
+          "contact": "9701844506"  //Provide the customer's phone number for better conversion rates 
       },
       "notes": {
           "address": "Razorpay Corporate Office"
@@ -61,6 +75,7 @@ function App() {
   return (
     <div className="App">
       <button onClick={paymentHandler}>PAY NOW</button>
+      <Toaster/>
     </div>
   );
 }
